@@ -1,0 +1,147 @@
+import java.util.Iterator;
+
+public class MyArrayList<T> implements Iterable<T> {
+    private Object[] array;
+    private int size = 0;
+    private int capacity = 5;
+
+    public MyArrayList() {
+        array = new Object[capacity];
+    }
+
+    public T get(int index) {
+        return (T) array[index];
+    }
+
+    public void add(T newItem) {
+        if (size == capacity) {
+            increaseBuffer();
+        }
+        array[size++] = newItem;
+    }
+
+    public void addForward(T newItem) {
+        if (size == capacity) {
+            increaseBuffer();
+        }
+
+        for (int i = size; i > 0; i--) {
+            array[i] = array[i - 1]; // moving right
+        }
+        size++;
+        array[0] = newItem; // Insertion
+    }
+
+    public void removeLast() {
+        size--;
+    }
+
+    public void removeFirst() {
+        for (int i = 0; i < size - 1; i++) {
+            array[i] = array[i + 1]; // moving right
+        }
+
+        size--;
+    }
+
+    public void add(T newItem, int index){
+        if(index > size){
+            throw new IndexOutOfBoundsException("index out of range");
+        }
+        Object[] array2 = new Object[size+1];
+        boolean added  = false;
+        for(int i = 0; i < size+1; i++){
+            if(!added){
+                array2[i] = array[i];
+            }
+            if(index == i){
+                array2[i] = newItem;
+                added = true;
+                continue;
+            }
+            if(added){
+                array2[i] = array[i-1];
+            }
+        }
+        size = size + 1;
+        array = array2;
+    }
+
+    public int find(T keyItem){
+        for(int i = 0; i < size; i++){
+            if(keyItem == array[i]){
+                return i;
+            }
+        }
+        return 1;
+    }
+
+    public T remove(int index){
+        if(index >= size){
+            throw new IndexOutOfBoundsException("index out of range");
+        }
+        boolean removed = false;
+        Object[] array2 = new Object [size-1];
+        for(int i = 0; i < size-1; i++){
+            if(index == 1){
+                removed = true;
+            }
+            if(!removed){
+                array2[i] = array[i];
+            }
+            else{
+                array2[i] = array[i+1];
+            }
+        }
+        size = size-1;
+        T temp = (T) array[index];
+        array = array2;
+        return temp;
+    }
+
+    public void reverse(){
+        Object[] array2 = new Object[size];
+        int j = size - 1;
+        for(int i = 0; i < size; i++){
+            array2[i] = array[j];
+            j -= 1;
+        }
+        array = array2;
+    }
+
+
+    private void increaseBuffer() {
+        capacity = (int) (1.5 * capacity);
+        Object[] array2 = new Object[capacity];
+        for (int i = 0; i < size; i++) {
+            array2[i] = array[i];
+        }
+
+        array = array2;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new MyIterator();
+    }
+
+    private class MyIterator implements Iterator<T> {
+        int cursor = 0;
+
+        @Override
+        public boolean hasNext() {
+            return cursor != getSize();
+        }
+
+        @Override
+        public T next() {
+            T nextItem = get(cursor);
+            cursor++;
+            return nextItem;
+        }
+    }
+}
